@@ -1,4 +1,3 @@
-# Correpond au corrigé du dernier exercice du TD3+4 (TD3-s7.py)
 
 import http.server
 import socketserver
@@ -113,12 +112,12 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
   #
   # On génère et on renvoie la liste des régions et leur coordonnées (version TD3)
   #
-  def send_regions(self):
+  def send_stations(self):
 
-    conn = sqlite3.connect('ter.sqlite')
+    conn = sqlite3.connect('StationHydro-2018.sqlite')
     c = conn.cursor()
     
-    c.execute("SELECT * FROM 'regions'")
+    c.execute("SELECT * FROM 'LbStationsHydro'")
     r = c.fetchall()
     
     headers = [('Content-Type','application/json')];
@@ -126,11 +125,11 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
     self.send(body,headers)
 
   #
-  # On génère et on renvoie un graphique de ponctualite (cf. TD1)
+  # On génère et on renvoie un graphique de l'hydrometrie
   #
-  def send_ponctualite(self):
+  def send_hydrometrie(self):
 
-    conn = sqlite3.connect('ter.sqlite')
+    conn = sqlite3.connect('hydrometrie_qmj_historique.sqlite')
     c = conn.cursor()
     
     if len(self.path_info) <= 1 or self.path_info[1] == '' :   # pas de paramètre => liste par défaut
@@ -165,7 +164,7 @@ class RequestHandler(http.server.SimpleHTTPRequestHandler):
     for l in (stations) :
         c.execute("SELECT * FROM 'StationHydro-2018' WHERE LbStationHydro=? ORDER BY Date",l[:1])  # ou (l[0],)
         r = c.fetchall()
-        # recupération de la date (colonne 2) et transformation dans le format de pyplot
+        # recupération de la date (colonne 3) et transformation dans le format de pyplot
         x = [pltd.date2num(dt.date(int(a[1][:4]),int(a[1][5:]),1)) for a in r if not a[7] == '']
         # récupération de l'hydrométrie (colonne 8)
         y = [float(a[7]) for a in r if not a[7] == '']
